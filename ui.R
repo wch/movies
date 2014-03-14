@@ -19,7 +19,7 @@ shinyUI(fluidPage(
             "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi",
             "Short", "Sport", "Thriller", "War", "Western")
         ),
-        textInput("director", "Director name contains (e.g., Miyazake)"),
+        textInput("director", "Director name contains (e.g., Miyazaki)"),
         textInput("cast", "Cast names contains (e.g. Tom Hanks)")
       ),
       wellPanel(
