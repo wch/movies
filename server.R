@@ -47,6 +47,17 @@ shinyServer(function(input, output, session) {
       genre <- paste0("%", input$genre, "%")
       m <- m %.% filter(Genre %like% genre)
     }
+    # Optional: filter by director
+    if (!is.null(input$director) && input$director != "") {
+      director <- paste0("%", input$director, "%")
+      m <- m %.% filter(Director %like% director)
+    }
+    # Optional: filter by cast member
+    if (!is.null(input$cast) && input$cast != "") {
+      cast <- paste0("%", input$cast, "%")
+      m <- m %.% filter(Cast %like% cast)
+    }
+
 
     m <- as.data.frame(m)
 

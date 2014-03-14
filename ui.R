@@ -18,7 +18,9 @@ shinyUI(fluidPage(
             "Crime", "Documentary", "Drama", "Family", "Fantasy", "History",
             "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi",
             "Short", "Sport", "Thriller", "War", "Western")
-        )
+        ),
+        textInput("director", "Director name contains (e.g., Miyazake)"),
+        textInput("cast", "Cast names contains (e.g. Tom Hanks)")
       ),
       wellPanel(
         selectInput("xvar", "X-axis variable", axis_vars, selected = "Meter"),
