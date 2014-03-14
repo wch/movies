@@ -11,6 +11,8 @@ shinyUI(fluidPage(
         sliderInput("year", "Year released", 1940, 2014, value = c(1970, 2014)),
         sliderInput("oscars", "Minimum number of Oscar wins (all categories)",
           0, 4, 0, step = 1),
+        sliderInput("boxoffice", "Dollars at Box Office (millions)",
+          0, 800, c(0, 800), step = 1),
         selectInput("genre", "Genre (a movie can have multiple genres)",
           c("All", "Action", "Adventure", "Animation", "Biography", "Comedy",
             "Crime", "Documentary", "Drama", "Family", "Fantasy", "History",

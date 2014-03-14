@@ -27,14 +27,20 @@ shinyServer(function(input, output, session) {
     oscars <- input$oscars
     minyear <- input$year[1]
     maxyear <- input$year[2]
+    minboxoffice <- input$boxoffice[1] * 1e6
+    maxboxoffice <- input$boxoffice[2] * 1e6
 
     # Apply filters
-    m <- all_movies %.% filter(
-      Reviews >= reviews,
-      Oscars >= oscars,
-      Year >= minyear,
-      Year <= maxyear) %.%
-    arrange(Oscars)
+    m <- all_movies %.%
+      filter(
+        Reviews >= reviews,
+        Oscars >= oscars,
+        Year >= minyear,
+        Year <= maxyear,
+        BoxOffice >= minboxoffice,
+        BoxOffice <= maxboxoffice
+      ) %.%
+      arrange(Oscars)
 
     # Optional: filter by genre
     if (input$genre != "All") {
@@ -43,7 +49,11 @@ shinyServer(function(input, output, session) {
     }
 
     m <- as.data.frame(m)
-    m$has_oscar <- "No"
+
+    # Add column which says whether the movie won any Oscars
+    # Be a little careful in case we have a zero-row data frame
+    m$has_oscar <- character(nrow(m))
+    m$has_oscar[m$Oscars == 0] <- "No"
     m$has_oscar[m$Oscars >= 1] <- "Yes"
     m
   })
