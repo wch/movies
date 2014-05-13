@@ -9,12 +9,11 @@ omdb <- tbl(db, "omdb")
 tomatoes <- tbl(db, "tomatoes")
 
 # Join tables, filtering out those with <10 reviews, and select specified columns
-# TODO: Rename columns like Rating.x, after dplyr issue #317 is fixed
-all_movies <- inner_join(omdb, tomatoes, by = "ID") %.%
-  filter(Reviews >= 10) %.%
-  select(ID, imdbID, Title, Year, Rating.x, Runtime, Genre, Released,
+all_movies <- inner_join(omdb, tomatoes, by = "ID") %>%
+  filter(Reviews >= 10) %>%
+  select(ID, imdbID, Title, Year, Rating_m = Rating.x, Runtime, Genre, Released,
     Director, Writer, imdbRating, imdbVotes, Language, Country, Oscars,
-    Rating.y, Meter, Reviews, Fresh, Rotten, userMeter, userRating, userReviews,
+    Rating = Rating.y, Meter, Reviews, Fresh, Rotten, userMeter, userRating, userReviews,
     BoxOffice, Production)
 
 
@@ -31,7 +30,7 @@ shinyServer(function(input, output, session) {
     maxboxoffice <- input$boxoffice[2] * 1e6
 
     # Apply filters
-    m <- all_movies %.%
+    m <- all_movies %>%
       filter(
         Reviews >= reviews,
         Oscars >= oscars,
@@ -39,23 +38,23 @@ shinyServer(function(input, output, session) {
         Year <= maxyear,
         BoxOffice >= minboxoffice,
         BoxOffice <= maxboxoffice
-      ) %.%
+      ) %>%
       arrange(Oscars)
 
     # Optional: filter by genre
     if (input$genre != "All") {
       genre <- paste0("%", input$genre, "%")
-      m <- m %.% filter(Genre %like% genre)
+      m <- m %>% filter(Genre %like% genre)
     }
     # Optional: filter by director
     if (!is.null(input$director) && input$director != "") {
       director <- paste0("%", input$director, "%")
-      m <- m %.% filter(Director %like% director)
+      m <- m %>% filter(Director %like% director)
     }
     # Optional: filter by cast member
     if (!is.null(input$cast) && input$cast != "") {
       cast <- paste0("%", input$cast, "%")
-      m <- m %.% filter(Cast %like% cast)
+      m <- m %>% filter(Cast %like% cast)
     }
 
 
@@ -85,30 +84,33 @@ shinyServer(function(input, output, session) {
   }
 
   # A reactive expression with the ggvis plot
-  rgv <- reactive({
-    # Normally we could do something like props(x = ~BoxOffice, y = ~Reviews),
-    # but since the inputs are strings, we need to do a little more work.
-    p <- props(x = prop(as.name(input$xvar)), y = prop(as.name(input$yvar)))
-
+  vis <- reactive({
     # Lables for axes
     xvar_name <- names(axis_vars)[axis_vars == input$xvar]
     yvar_name <- names(axis_vars)[axis_vars == input$yvar]
 
-    ggvis(movies, p) +
-      mark_point(props(size := 50, size.hover := 200,
+    # Normally we could do something like props(x = ~BoxOffice, y = ~Reviews),
+    # but since the inputs are strings, we need to do a little more work.
+    xvar <- prop(as.symbol(input$xvar))
+    yvar <- prop(as.symbol(input$yvar))
+
+    movies %>%
+      ggvis(x = xvar, y = yvar) %>%
+      layer_points(size := 50, size.hover := 200,
         fillOpacity := 0.2, fillOpacity.hover := 0.5,
-        stroke = ~has_oscar, key := ~ID)) +
-      tooltip(movie_tooltip) +
-      guide_axis("x", title = xvar_name) +
-      guide_axis("y", title = yvar_name) +
-      guide_legend(stroke = "stroke", title = "Won Oscar",
-        values = c("Yes", "No")) +
-      dscale("stroke", type = "nominal", domain = c("Yes", "No"),
-        range = c("orange", "#aaa")) +
-      opts(width = 600, height = 500, renderer = "canvas", duration = 0)
+        stroke = ~has_oscar, key := ~ID) %>%
+      add_tooltip(movie_tooltip, "hover") %>%
+      add_guide_axis("x", title = xvar_name) %>%
+      add_guide_axis("y", title = yvar_name) %>%
+      add_guide_legend(stroke = "stroke", title = "Won Oscar",
+        values = c("Yes", "No")) %>%
+      set_dscale("stroke", type = "nominal", domain = c("Yes", "No"),
+        range = c("orange", "#aaa")) %>%
+      set_options(width = 600, height = 500, renderer = "canvas",
+        duration = 0)
   })
 
-  observe_ggvis(rgv, "plot1", session)
+  vis %>% bind_shiny("plot1")
 
   output$n_movies <- renderText({ nrow(movies()) })
 })
