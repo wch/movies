@@ -74,7 +74,7 @@ shinyServer(function(input, output, session) {
     if (is.null(x$ID)) return(NULL)
 
     # Pick out the movie with this ID
-    all_movies <- movies()
+    all_movies <- isolate(movies())
     movie <- all_movies[all_movies$ID == x$ID, ]
 
     paste0("<b>", movie$Title, "</b><br>",
