@@ -106,7 +106,7 @@ shinyServer(function(input, output, session) {
         values = c("Yes", "No")) %>%
       set_dscale("stroke", type = "nominal", domain = c("Yes", "No"),
         range = c("orange", "#aaa")) %>%
-      set_options(width = 600, height = 500, renderer = "canvas",
+      set_options(width = 500, height = 500, renderer = "canvas",
         duration = 0)
   })
 
