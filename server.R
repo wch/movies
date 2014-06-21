@@ -91,8 +91,8 @@ shinyServer(function(input, output, session) {
 
     # Normally we could do something like props(x = ~BoxOffice, y = ~Reviews),
     # but since the inputs are strings, we need to do a little more work.
-    xvar <- prop(as.symbol(input$xvar))
-    yvar <- prop(as.symbol(input$yvar))
+    xvar <- prop("x", as.symbol(input$xvar))
+    yvar <- prop("y", as.symbol(input$yvar))
 
     movies %>%
       ggvis(x = xvar, y = yvar) %>%
@@ -100,14 +100,12 @@ shinyServer(function(input, output, session) {
         fillOpacity := 0.2, fillOpacity.hover := 0.5,
         stroke = ~has_oscar, key := ~ID) %>%
       add_tooltip(movie_tooltip, "hover") %>%
-      add_guide_axis("x", title = xvar_name) %>%
-      add_guide_axis("y", title = yvar_name) %>%
-      add_guide_legend(stroke = "stroke", title = "Won Oscar",
-        values = c("Yes", "No")) %>%
-      set_dscale("stroke", type = "nominal", domain = c("Yes", "No"),
+      add_axis("x", title = xvar_name) %>%
+      add_axis("y", title = yvar_name) %>%
+      add_legend("stroke", title = "Won Oscar", values = c("Yes", "No")) %>%
+      scale_nominal("stroke", domain = c("Yes", "No"),
         range = c("orange", "#aaa")) %>%
-      set_options(width = 500, height = 500, renderer = "canvas",
-        duration = 0)
+      set_options(width = 500, height = 500)
   })
 
   vis %>% bind_shiny("plot1")
