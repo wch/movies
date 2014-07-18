@@ -2,7 +2,7 @@ This is the source code for a movie explorer app which runs on R and Shiny. The 
 
 To run it locally, you'll need to install the latest versions of [ggvis](http://ggvis.rstudio.com), [Shiny](http://shiny.rstudio.com), and [dplyr](https://github.com/hadley/dplyr), as well as [RSQLite](http://cran.r-project.org/web/packages/RSQLite/index.html).
 
-```S
+```R
 # Install devtools 1.4 if needed
 if (!require('devtools') || packageVersion('devtools') < 1.4) install.packages('devtools')
 
@@ -11,7 +11,9 @@ devtools::install_github(c('rstudio/ggvis', 'rstudio/shiny', 'hadley/dplyr'))
 install.packages(c('RSQLite', 'RSQLite.extfuns'))
 ```
 
-Once all these packages are installed, you can run this app by entering the directory, and then running the following in R:
+You may need to restart R to make sure the newly-installed packages work properly.
+
+After all these packages are installed, you can run this app by entering the directory, and then running the following in R:
 
 ```S
 shiny::runApp()
